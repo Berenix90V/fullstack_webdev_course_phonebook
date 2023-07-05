@@ -1,4 +1,4 @@
-import express, {request, response} from 'express'
+import express from 'express'
 const app = express()
 app.use(express.json())
 
@@ -60,6 +60,12 @@ app.post("/api/persons", (request, response) =>{
     const person = request.body
     if(!person)
         response.status(400).json({error:'Content missing'})
+    if(!person.name)
+        response.status(400).json({error:'Name missing'})
+    if(!person.number)
+        response.status(400).json({error:'Number missing'})
+    if(persons.find(p=>p.name === person.name))
+        response.status(400).json({error:'Name must be unique'})
     const newPerson = {
         id: generateID(),
         name: person.name,
