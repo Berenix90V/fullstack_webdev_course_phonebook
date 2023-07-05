@@ -48,6 +48,28 @@ app.delete("/api/persons/:id", (request, response) => {
     response.status(204).end()
 })
 
+const generateID = () => {
+    if(persons){
+        const maxID = Math.max(...persons.map(p=>p.id))
+        return Math.floor(Math.random() * (1000 - maxID + 1)) + maxID;
+    }
+    else
+        return 0
+}
+app.post("/api/persons", (request, response) =>{
+    const person = request.body
+    if(!person)
+        response.status(400).json({error:'Content missing'})
+    const newPerson = {
+        id: generateID(),
+        name: person.name,
+        number: person.number
+    }
+    persons = persons.concat(newPerson)
+    response.json(newPerson)
+
+})
+
 const PORT = 3001
 app.listen(PORT)
 console.log(`Server listening on port ${PORT}`)
