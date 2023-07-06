@@ -2,7 +2,12 @@ import express from 'express'
 import morgan from "morgan";
 const app = express()
 app.use(express.json())
-app.use(morgan('tiny'))
+
+morgan.token('content', (request)=>{
+    if(Object.keys(request.body).length>0)
+        return JSON.stringify(request.body)
+})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
 let persons = [
     {
