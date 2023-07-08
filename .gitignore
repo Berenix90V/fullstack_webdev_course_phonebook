@@ -131,3 +131,6 @@ dist
 
 .idea
 *.yaml
+*.dockerignore
+Dockerfile
+*.toml
