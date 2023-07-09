@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "http://localhost:3001/api/persons"
+const baseUrl = "/api/persons"
 
 const getAll = ()=> {
     return axios
@@ -25,9 +25,10 @@ const update = (id, personObject) => {
         .then(response=> response.data)
 }
 
-export default {
+const personsServices = {
     getAll: getAll,
     create: create,
     deletePerson: deletePerson,
     update: update
 }
+export default personsServices

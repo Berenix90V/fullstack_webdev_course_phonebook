@@ -4,7 +4,9 @@ import morgan from "morgan";
 const app = express()
 
 app.use(cors())
+app.use(express.static('build'))
 app.use(express.json())
+
 
 morgan.token('content', (request)=>{
     if(Object.keys(request.body).length>0)
