@@ -60,38 +60,21 @@ app.get("/api/persons/:id", (request, response) => {
         response.status(404).end()
 })
 
-app.delete("/api/persons/:id", (request, response) => {
+/*app.delete("/api/persons/:id", (request, response) => {
     const id = Number(request.params.id)
     persons = persons.filter(p=>p.id!==id)
     response.status(204).end()
-})
+})*/
 
-const generateID = () => {
-    if(persons){
-        const maxID = Math.max(...persons.map(p=>p.id))
-        return Math.floor(Math.random() * (1000 - maxID + 1)) + maxID;
-    }
-    else
-        return 0
-}
 app.post("/api/persons", (request, response) =>{
-    const person = request.body
-    if(!person)
-        response.status(400).json({error:'Content missing'})
-    if(!person.name)
-        response.status(400).json({error:'Name missing'})
-    if(!person.number)
-        response.status(400).json({error:'Number missing'})
-    if(persons.find(p=>p.name === person.name))
-        response.status(400).json({error:'Name must be unique'})
-    const newPerson = {
-        id: generateID(),
-        name: person.name,
-        number: person.number
-    }
-    persons = persons.concat(newPerson)
-    response.json(newPerson)
-
+    const personObj = request.body
+    const person = new Person({
+        name: personObj.name,
+        number: personObj.number
+    })
+    person.save().then(savedPerson=>{
+        response.json(savedPerson)
+    })
 })
 
 const PORT = process.env.PORT
