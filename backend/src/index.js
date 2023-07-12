@@ -1,6 +1,8 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import morgan from "morgan";
+import Person from "./models/person.js";
 const app = express()
 
 app.use(cors())
@@ -14,6 +16,7 @@ morgan.token('content', (request)=>{
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
+/*
 let persons = [
     {
         "id": 1,
@@ -36,13 +39,16 @@ let persons = [
         "number": "39-23-6423122"
     }
 ]
-
+*/
 app.get("/api/persons", (request, response) =>{
-    response.json(persons)
+    Person.find({}).then(people =>{
+        console.log(people)
+        response.json(people)
+    })
 })
 
 app.get("/api/info", (request, response)=> {
-    response.send(`<p>Phone book has ${persons.length} people </p> <p>${new Date()}</p>`)
+    response.send(`<p>Phone book has people saved </p> <p>${new Date()}</p>`)
 })
 
 app.get("/api/persons/:id", (request, response) => {
@@ -88,6 +94,6 @@ app.post("/api/persons", (request, response) =>{
 
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT)
 console.log(`Server listening on port ${PORT}`)
