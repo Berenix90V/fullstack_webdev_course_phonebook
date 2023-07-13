@@ -9,7 +9,7 @@ const unknownEndPoint = (request, response) => {
     response.status(404).send({error: 'Unknown endpoint'})
 }
 const errorHandler = (error, request, response, next)=>{
-    if(error.name === "CasteError")
+    if(error.name === "CastError")
         response.status(400).send({error: 'malformatted id'})
     next(error)
 }
@@ -41,17 +41,25 @@ app.post("/api/persons", (request, response) =>{
     })
 })
 
-app.get("/api/info", (request, response)=> {
-    response.send(`<p>Phone book has people saved </p> <p>${new Date()}</p>`)
+app.get("/api/info", (request, response, next)=> {
+    Person.countDocuments()
+        .then(count => {
+            response.send(`<p>Phone book has ${count} people saved </p> <p>${new Date()}</p>`)
+        })
+        .catch(error => next(error))
+
 })
 
-app.get("/api/persons/:id", (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(n=>n.id===id)
-    if(person)
-        response.json(person)
-    else
-        response.status(404).end()
+app.get("/api/persons/:id", (request, response, next) => {
+    const personID = request.params.id
+    Person.findById(personID)
+        .then(person => {
+            if(person)
+                response.json(person)
+            else
+                response.status(404).send({error:'Person not found'})
+        })
+        .catch(error => next(error))
 })
 
 app.delete("/api/persons/:id", (request, response, next) => {
