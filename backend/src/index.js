@@ -5,6 +5,15 @@ import morgan from "morgan";
 import Person from "./models/person.js";
 const app = express()
 
+const unknownEndPoint = (request, response) => {
+    response.status(404).send({error: 'Unknown endpoint'})
+}
+const errorHandler = (error, request, response, next)=>{
+    if(error.name === "CasteError")
+        response.status(400).send({error: 'malformatted id'})
+    next(error)
+}
+
 app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
@@ -60,12 +69,13 @@ app.get("/api/persons/:id", (request, response) => {
         response.status(404).end()
 })
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
     const personID = request.params.id
     Person.findByIdAndRemove(personID)
         .then(deletedPerson => {
             response.status(204).end()
         })
+        .catch(error => next(error))
 })
 
 app.post("/api/persons", (request, response) =>{
@@ -78,6 +88,9 @@ app.post("/api/persons", (request, response) =>{
         response.json(savedPerson)
     })
 })
+
+app.use(unknownEndPoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT)
