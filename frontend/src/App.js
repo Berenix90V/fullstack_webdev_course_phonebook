@@ -44,6 +44,8 @@ const App = () => {
                     .update(existingPerson.id, newPerson)
                     .then(updatedPerson=>{
                         setPersons(persons.map(p=>p.id!==updatedPerson.id? p : updatedPerson))
+                        setNewName('')
+                        setNewNumber('')
                     })
                     .catch(error=>{
                         setNotificationMessage(`Information about ${newPerson.name} has already been removed from server`)
