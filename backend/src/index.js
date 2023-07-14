@@ -9,15 +9,17 @@ const unknownEndPoint = (request, response) => {
     response.status(404).send({error: 'Unknown endpoint'})
 }
 const errorHandler = (error, request, response, next)=>{
-    if(error.name === "CastError")
-        response.status(400).send({error: 'malformatted id'})
+    if(error.name === "CastError"){
+        response.status(400).send({error: 'malformatted id', name: error.name})
+    } else if(error.name === "ValidationError"){
+        response.status(400).json({error: error.message, name: error.name})
+    }
     next(error)
 }
 
 app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
-
 
 morgan.token('content', (request)=>{
     if(Object.keys(request.body).length>0)
@@ -30,15 +32,17 @@ app.get("/api/persons", (request, response) =>{
         response.json(people)
     })
 })
-app.post("/api/persons", (request, response) =>{
+app.post("/api/persons", (request, response, next) =>{
     const personObj = request.body
     const person = new Person({
         name: personObj.name,
         number: personObj.number
     })
-    person.save().then(savedPerson=>{
-        response.json(savedPerson)
-    })
+    person.save()
+        .then(savedPerson=>{
+            response.json(savedPerson)
+        })
+        .catch(error => next(error))
 })
 
 app.get("/api/info", (request, response, next)=> {
@@ -78,9 +82,9 @@ app.put("/api/persons/:id", (request, response, next) => {
         name: body.name,
         number: body.number
     }
-    Person.findByIdAndUpdate(personID, newPerson,{new:true})
-        .then(updatedNote => {
-            response.json(updatedNote)
+    Person.findByIdAndUpdate(personID, newPerson,{new:true, runValidators:true, context: 'query'})
+        .then(updatedPerson => {
+            response.json(updatedPerson)
         })
         .catch(error => next(error))
 })
