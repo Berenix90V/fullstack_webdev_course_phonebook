@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const url = process.env.MONGO_URL
 mongoose.set('strictQuery', false)
@@ -7,7 +7,7 @@ mongoose.connect(url)
     .then(result => {
         console.log('Connected to MongoDB')
     })
-    .catch(error=> {
+    .catch(error => {
         console.log('Error connecting to Mongo', error.message)
     })
 
@@ -15,13 +15,13 @@ const personSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minLength:3
+        minLength: 3
     },
-    number:{
+    number: {
         type: String,
         required: true,
         minLength: 8,
-        validate:{
+        validate: {
             validator: v => {
                 return /^\d{2,3}-\d+$/.test(v)
             },
@@ -31,7 +31,7 @@ const personSchema = new mongoose.Schema({
 })
 
 personSchema.set('toJSON', {
-    transform: (document, returnedObject) =>{
+    transform: (document, returnedObject) => {
         returnedObject.id = document._id
         delete returnedObject._id
         delete returnedObject.__v
@@ -41,4 +41,3 @@ personSchema.set('toJSON', {
 const Person = mongoose.model('Person', personSchema)
 
 export default Person
-
